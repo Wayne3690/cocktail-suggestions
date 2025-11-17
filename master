@@ -1,0 +1,456 @@
+import React, { useState } from 'react';
+import { Wine, Users, DollarSign, ChefHat, Calendar, RefreshCw } from 'lucide-react';
+
+const CocktailGenerator = () => {
+  const [formData, setFormData] = useState({
+    eventType: 'casual-party',
+    attendees: 20,
+    liquorType: 'vodka',
+    budgetTier: 'medium',
+    skillLevel: 'intermediate',
+    season: 'summer',
+    dietaryRestrictions: []
+  });
+  
+  const [cocktails, setCocktails] = useState([]);
+
+  const eventTypes = [
+    { value: 'casual-party', label: 'Casual Party' },
+    { value: 'wedding', label: 'Wedding Reception' },
+    { value: 'corporate', label: 'Corporate Event' },
+    { value: 'birthday', label: 'Birthday Celebration' },
+    { value: 'holiday', label: 'Holiday Party' },
+    { value: 'cocktail-hour', label: 'Cocktail Hour' }
+  ];
+
+  const liquorTypes = [
+    'vodka', 'gin', 'rum', 'tequila', 'whiskey', 'bourbon', 'mixed'
+  ];
+
+  const seasons = ['spring', 'summer', 'fall', 'winter'];
+  
+  const restrictions = ['vegan', 'sugar-free', 'low-alcohol', 'non-alcoholic-option'];
+
+  const cocktailDatabase = {
+    vodka: [
+      {
+        name: 'Classic Moscow Mule',
+        ingredients: [
+          { item: 'Vodka', amount: '2 oz', type: 'liquor' },
+          { item: 'Ginger Beer', amount: '4 oz', type: 'mixer' },
+          { item: 'Fresh Lime Juice', amount: '0.5 oz', type: 'juice' },
+          { item: 'Simple Syrup', amount: '0.25 oz', type: 'sugar' }
+        ],
+        garnish: 'Lime wheel and mint sprig',
+        glassware: 'Copper mug or highball glass',
+        complexity: 'easy',
+        season: ['spring', 'summer', 'fall'],
+        batching: 'Mix vodka, lime juice, and simple syrup. Add ginger beer just before serving.'
+      },
+      {
+        name: 'Vodka Cranberry Spritz',
+        ingredients: [
+          { item: 'Vodka', amount: '1.5 oz', type: 'liquor' },
+          { item: 'Cranberry Juice', amount: '3 oz', type: 'juice' },
+          { item: 'Club Soda', amount: '2 oz', type: 'mixer' },
+          { item: 'Simple Syrup', amount: '0.5 oz', type: 'sugar' }
+        ],
+        garnish: 'Fresh cranberries and rosemary',
+        glassware: 'Wine glass',
+        complexity: 'easy',
+        season: ['fall', 'winter'],
+        batching: 'Pre-mix vodka, cranberry juice, and simple syrup. Top with club soda when serving.'
+      }
+    ],
+    gin: [
+      {
+        name: 'Garden Gin Fizz',
+        ingredients: [
+          { item: 'Gin', amount: '2 oz', type: 'liquor' },
+          { item: 'Fresh Lemon Juice', amount: '1 oz', type: 'juice' },
+          { item: 'Simple Syrup', amount: '0.75 oz', type: 'sugar' },
+          { item: 'Club Soda', amount: '2 oz', type: 'mixer' },
+          { item: 'Cucumber Slices', amount: '3 slices', type: 'garnish' }
+        ],
+        garnish: 'Cucumber ribbon and basil leaf',
+        glassware: 'Highball glass',
+        complexity: 'intermediate',
+        season: ['spring', 'summer'],
+        batching: 'Muddle cucumber with simple syrup. Add gin and lemon juice. Top with soda when serving.'
+      },
+      {
+        name: 'Classic Gin & Tonic',
+        ingredients: [
+          { item: 'Gin', amount: '2 oz', type: 'liquor' },
+          { item: 'Tonic Water', amount: '4 oz', type: 'mixer' }
+        ],
+        garnish: 'Lime wedge',
+        glassware: 'Highball glass',
+        complexity: 'easy',
+        season: ['spring', 'summer', 'fall', 'winter'],
+        batching: 'Pour gin over ice, top with tonic just before serving.'
+      }
+    ],
+    rum: [
+      {
+        name: 'Tropical Rum Punch',
+        ingredients: [
+          { item: 'White Rum', amount: '2 oz', type: 'liquor' },
+          { item: 'Pineapple Juice', amount: '2 oz', type: 'juice' },
+          { item: 'Orange Juice', amount: '1 oz', type: 'juice' },
+          { item: 'Lime Juice', amount: '0.5 oz', type: 'juice' },
+          { item: 'Grenadine', amount: '0.5 oz', type: 'sugar' }
+        ],
+        garnish: 'Pineapple wedge and cherry',
+        glassware: 'Hurricane glass or tumbler',
+        complexity: 'easy',
+        season: ['spring', 'summer'],
+        batching: 'Mix all ingredients except grenadine. Float grenadine on top when serving.'
+      },
+      {
+        name: 'Dark & Stormy',
+        ingredients: [
+          { item: 'Dark Rum', amount: '2 oz', type: 'liquor' },
+          { item: 'Ginger Beer', amount: '4 oz', type: 'mixer' },
+          { item: 'Fresh Lime Juice', amount: '0.5 oz', type: 'juice' }
+        ],
+        garnish: 'Lime wheel',
+        glassware: 'Highball glass',
+        complexity: 'easy',
+        season: ['spring', 'summer', 'fall', 'winter'],
+        batching: 'Mix rum and lime juice. Top with ginger beer just before serving.'
+      }
+    ],
+    tequila: [
+      {
+        name: 'Fresh Margarita',
+        ingredients: [
+          { item: 'Tequila Blanco', amount: '2 oz', type: 'liquor' },
+          { item: 'Fresh Lime Juice', amount: '1 oz', type: 'juice' },
+          { item: 'Orange Liqueur', amount: '1 oz', type: 'liquor' },
+          { item: 'Agave Syrup', amount: '0.5 oz', type: 'sugar' }
+        ],
+        garnish: 'Lime wheel and salt rim',
+        glassware: 'Rocks glass',
+        complexity: 'intermediate',
+        season: ['spring', 'summer', 'fall'],
+        batching: 'Mix all ingredients. Serve over ice with salted rim.'
+      },
+      {
+        name: 'Paloma',
+        ingredients: [
+          { item: 'Tequila Blanco', amount: '2 oz', type: 'liquor' },
+          { item: 'Fresh Grapefruit Juice', amount: '3 oz', type: 'juice' },
+          { item: 'Lime Juice', amount: '0.5 oz', type: 'juice' },
+          { item: 'Club Soda', amount: '2 oz', type: 'mixer' },
+          { item: 'Agave Syrup', amount: '0.5 oz', type: 'sugar' }
+        ],
+        garnish: 'Grapefruit wedge and salt rim',
+        glassware: 'Highball glass',
+        complexity: 'easy',
+        season: ['spring', 'summer'],
+        batching: 'Mix tequila, juices, and agave. Top with soda when serving.'
+      }
+    ],
+    whiskey: [
+      {
+        name: 'Whiskey Sour',
+        ingredients: [
+          { item: 'Whiskey', amount: '2 oz', type: 'liquor' },
+          { item: 'Fresh Lemon Juice', amount: '1 oz', type: 'juice' },
+          { item: 'Simple Syrup', amount: '0.75 oz', type: 'sugar' },
+          { item: 'Egg White', amount: '0.5 oz', type: 'other' }
+        ],
+        garnish: 'Lemon wheel and cherry',
+        glassware: 'Rocks glass',
+        complexity: 'intermediate',
+        season: ['fall', 'winter'],
+        batching: 'Dry shake with egg white, then shake with ice. Strain into glass.'
+      },
+      {
+        name: 'Whiskey Highball',
+        ingredients: [
+          { item: 'Whiskey', amount: '2 oz', type: 'liquor' },
+          { item: 'Club Soda', amount: '4 oz', type: 'mixer' }
+        ],
+        garnish: 'Lemon peel',
+        glassware: 'Highball glass',
+        complexity: 'easy',
+        season: ['spring', 'summer', 'fall', 'winter'],
+        batching: 'Pour whiskey over ice, top with soda just before serving.'
+      }
+    ],
+    bourbon: [
+      {
+        name: 'Bourbon Smash',
+        ingredients: [
+          { item: 'Bourbon', amount: '2 oz', type: 'liquor' },
+          { item: 'Fresh Lemon Juice', amount: '0.75 oz', type: 'juice' },
+          { item: 'Simple Syrup', amount: '0.75 oz', type: 'sugar' },
+          { item: 'Mint Leaves', amount: '6-8 leaves', type: 'garnish' }
+        ],
+        garnish: 'Mint sprig and lemon wheel',
+        glassware: 'Rocks glass',
+        complexity: 'easy',
+        season: ['spring', 'summer', 'fall'],
+        batching: 'Muddle mint with simple syrup. Add bourbon and lemon juice. Shake and strain.'
+      }
+    ]
+  };
+
+  const generateCocktails = () => {
+    const { eventType, attendees, liquorType, skillLevel, season } = formData;
+    
+    let selectedCocktails = [];
+    
+    if (liquorType === 'mixed') {
+      // Select 2-3 different cocktails from different liquor types
+      const types = ['vodka', 'gin', 'rum', 'tequila'];
+      types.forEach(type => {
+        const options = cocktailDatabase[type]?.filter(c => 
+          c.season.includes(season) && 
+          (skillLevel === 'advanced' || c.complexity !== 'advanced')
+        ) || [];
+        if (options.length > 0) {
+          selectedCocktails.push(options[Math.floor(Math.random() * options.length)]);
+        }
+      });
+      selectedCocktails = selectedCocktails.slice(0, 3);
+    } else {
+      // Select cocktails from chosen liquor type
+      const options = cocktailDatabase[liquorType]?.filter(c => 
+        c.season.includes(season) && 
+        (skillLevel === 'advanced' || c.complexity !== 'advanced')
+      ) || [];
+      
+      const numCocktails = attendees > 50 ? 2 : 1;
+      for (let i = 0; i < numCocktails && i < options.length; i++) {
+        selectedCocktails.push(options[i]);
+      }
+    }
+
+    // Calculate quantities based on attendee count
+    const drinksPerPerson = eventType === 'cocktail-hour' ? 2 : 3;
+    const totalDrinks = attendees * drinksPerPerson;
+    
+    const cocktailsWithQuantities = selectedCocktails.map(cocktail => ({
+      ...cocktail,
+      servings: Math.ceil(totalDrinks / selectedCocktails.length),
+      scaledIngredients: cocktail.ingredients.map(ing => ({
+        ...ing,
+        totalAmount: calculateTotalAmount(ing.amount, Math.ceil(totalDrinks / selectedCocktails.length))
+      }))
+    }));
+
+    setCocktails(cocktailsWithQuantities);
+  };
+
+  const calculateTotalAmount = (amount, servings) => {
+    const match = amount.match(/([\d.]+)\s*(\w+)/);
+    if (!match) return amount;
+    
+    const value = parseFloat(match[1]);
+    const unit = match[2];
+    const total = value * servings;
+    
+    if (unit === 'oz') {
+      if (total >= 128) return `${(total / 128).toFixed(1)} gallons`;
+      if (total >= 32) return `${(total / 32).toFixed(1)} quarts`;
+      return `${total.toFixed(1)} oz`;
+    }
+    
+    return `${total} ${unit}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 flex items-center justify-center gap-3">
+            <Wine className="w-10 h-10" />
+            Knickerbocker Cocktail Generator
+          </h1>
+          <p className="text-blue-200 text-lg">A Databuddie Product</p>
+        </div>
+
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 md:p-8 shadow-2xl border border-white/20 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="flex items-center gap-2 text-white font-semibold mb-2">
+                <Users className="w-5 h-5" />
+                Event Type
+              </label>
+              <select
+                value={formData.eventType}
+                onChange={(e) => setFormData({...formData, eventType: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {eventTypes.map(type => (
+                  <option key={type.value} value={type.value} className="text-gray-900">
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-white font-semibold mb-2">
+                <Users className="w-5 h-5" />
+                Number of Attendees
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={formData.attendees}
+                onChange={(e) => setFormData({...formData, attendees: parseInt(e.target.value)})}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-white/50"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-white font-semibold mb-2">
+                <Wine className="w-5 h-5" />
+                Primary Liquor
+              </label>
+              <select
+                value={formData.liquorType}
+                onChange={(e) => setFormData({...formData, liquorType: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {liquorTypes.map(type => (
+                  <option key={type} value={type} className="text-gray-900 capitalize">
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-white font-semibold mb-2">
+                <DollarSign className="w-5 h-5" />
+                Budget Tier
+              </label>
+              <select
+                value={formData.budgetTier}
+                onChange={(e) => setFormData({...formData, budgetTier: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option value="low" className="text-gray-900">Budget-Friendly</option>
+                <option value="medium" className="text-gray-900">Moderate</option>
+                <option value="high" className="text-gray-900">Premium</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-white font-semibold mb-2">
+                <ChefHat className="w-5 h-5" />
+                Bartending Skill Level
+              </label>
+              <select
+                value={formData.skillLevel}
+                onChange={(e) => setFormData({...formData, skillLevel: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option value="beginner" className="text-gray-900">Beginner</option>
+                <option value="intermediate" className="text-gray-900">Intermediate</option>
+                <option value="advanced" className="text-gray-900">Advanced</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-white font-semibold mb-2">
+                <Calendar className="w-5 h-5" />
+                Season
+              </label>
+              <select
+                value={formData.season}
+                onChange={(e) => setFormData({...formData, season: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                {seasons.map(season => (
+                  <option key={season} value={season} className="text-gray-900 capitalize">
+                    {season}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <button
+            onClick={generateCocktails}
+            className="w-full mt-8 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 shadow-lg"
+          >
+            <RefreshCw className="w-5 h-5" />
+            Generate Cocktail Menu
+          </button>
+        </div>
+
+        {cocktails.length > 0 && (
+          <div className="space-y-6">
+            {cocktails.map((cocktail, idx) => (
+              <div key={idx} className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 md:p-8 shadow-2xl border border-white/20">
+                <h2 className="text-3xl font-bold text-white mb-4">{cocktail.name}</h2>
+                <p className="text-blue-200 text-lg mb-6">Makes {cocktail.servings} servings</p>
+                
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-3">Ingredients (per drink)</h3>
+                    <ul className="space-y-2">
+                      {cocktail.ingredients.map((ing, i) => (
+                        <li key={i} className="text-blue-100">
+                          <span className="font-medium">{ing.item}:</span> {ing.amount}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-3">Total Quantities Needed</h3>
+                    <ul className="space-y-2">
+                      {cocktail.scaledIngredients.map((ing, i) => (
+                        <li key={i} className="text-blue-100">
+                          <span className="font-medium">{ing.item}:</span> {ing.totalAmount}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Garnish</h3>
+                    <p className="text-blue-100">{cocktail.garnish}</p>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-2">Glassware</h3>
+                    <p className="text-blue-100">{cocktail.glassware}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Batching Instructions</h3>
+                  <p className="text-blue-100">{cocktail.batching}</p>
+                </div>
+              </div>
+            ))}
+
+            <div className="bg-gradient-to-r from-green-500/20 to-blue-500/20 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+              <h3 className="text-2xl font-bold text-white mb-4">Event Preparation Tips</h3>
+              <ul className="space-y-2 text-blue-100">
+                <li>• Pre-batch cocktail bases 2-4 hours before the event</li>
+                <li>• Keep carbonated mixers separate until serving</li>
+                <li>• Prep garnishes in advance and store in airtight containers</li>
+                <li>• Calculate 2-3 drinks per person for the first 2 hours</li>
+                <li>• Have backup ice - plan for 1.5 lbs per person</li>
+                <li>• Set up a self-serve station for simple cocktails to reduce bartending load</li>
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CocktailGenerator;
